@@ -137,8 +137,8 @@ public class CommandHandler {
 
             //First line is not used
 
-
-            String lastLine = output[output.length - 1];
+            //Ignore the last line as it can be inaccurate
+            String lastLine = output[output.length - 2];
             String[] split = splitLine(lastLine);
 
             if(split.length != 3){
@@ -150,7 +150,8 @@ public class CommandHandler {
             double lastFrameFinishTime = Double.parseDouble(lastFrameFinishTimeStr);
             int frameCount = 0;
 
-            for (int i = 1; i < output.length; i++) {
+            //Ignore the last line as it can be inaccurate
+            for (int i = 1; i < (output.length - 1); i++) {
                 String[] splitted = splitLine(output[i]);
                 String thisFrameFinishTimeStr = splitted[2];
                 double thisFrameFirstTime = Double.parseDouble(thisFrameFinishTimeStr);
