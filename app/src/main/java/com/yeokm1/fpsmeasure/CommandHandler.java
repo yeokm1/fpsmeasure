@@ -1,5 +1,7 @@
 package com.yeokm1.fpsmeasure;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import java.io.DataOutputStream;
@@ -34,8 +36,21 @@ public class CommandHandler {
 
     private boolean processOfGettingFPS = false;
 
+    private Intent fgServiceIntent;
+
+    private Context context;
+
+    private boolean measuring = false;
+
+    public CommandHandler(Context context){
+        this.context = context;
+        fgServiceIntent = new Intent(context.getApplicationContext(), FgService.class);
+    }
 
     public void startFPSMeasure(){
+        measuring = true;
+        context.startService(fgServiceIntent);
+
         try {
 
 
@@ -50,6 +65,10 @@ public class CommandHandler {
                     (new Runnable() {
                         public void run() {
 
+                            if(!measuring){
+                               return;
+                            }
+
                             if(processOfGettingFPS){
                                 return;
                             }
@@ -57,6 +76,10 @@ public class CommandHandler {
                             try {
                                 processOfGettingFPS = true;
                                 int fps = getFPS();
+
+                                fgServiceIntent.putExtra(FgService.INTENT_FPS_DATA, fps);
+                                context.startService(fgServiceIntent);
+
                                 Log.i(TAG, "FPS: " + fps);
                             }catch (Exception e){
                                 Log.e(TAG, "Scheduler " + e.getMessage());
@@ -78,6 +101,14 @@ public class CommandHandler {
 
 
     public void stopFPSMeasure(){
+        measuring = false;
+        context.stopService(fgServiceIntent);
+
+        if(scheduler != null){
+            scheduler.shutdownNow();
+            scheduler = null;
+        }
+
         if(process != null){
             try {
                 stdin.write("exit\n".getBytes());
