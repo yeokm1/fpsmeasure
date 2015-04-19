@@ -102,7 +102,6 @@ public class CommandHandler {
 
     public void stopFPSMeasure(){
         measuring = false;
-        context.stopService(fgServiceIntent);
 
         if(scheduler != null){
             scheduler.shutdownNow();
@@ -121,6 +120,8 @@ public class CommandHandler {
             process.destroy();
             process = null;
         }
+
+        context.stopService(fgServiceIntent);
 
     }
 
