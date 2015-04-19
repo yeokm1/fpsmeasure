@@ -36,7 +36,7 @@ public class FgService extends Service {
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
         fpsView = new TextView(this);
-        fpsView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 24);
+        fpsView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 36);
         fpsView.setTextColor(Color.YELLOW);
 
         setFPSViewText("NA");
