@@ -51,13 +51,21 @@ public class CommandHandler {
                         public void run() {
 
                             if(processOfGettingFPS){
-                                processOfGettingFPS = true;
+                                return;
                             }
-                            int fps = getFPS();
 
-                            processOfGettingFPS = false;
+                            try {
+                                processOfGettingFPS = true;
+                                int fps = getFPS();
+                                Log.i(TAG, "FPS: " + fps);
+                            }catch (Exception e){
+                                Log.e(TAG, "Scheduler " + e.getMessage());
+                            } finally{
+                                processOfGettingFPS = false;
+                            }
 
-                            Log.i(TAG, "FPS: " + fps);
+
+
 
                         }
                     }, 0, UPDATE_RATE, TimeUnit.MILLISECONDS);
@@ -127,7 +135,7 @@ public class CommandHandler {
                 return (frameCount <= MAX_FPS) ? frameCount : MAX_FPS;
             }
         }catch (Exception e){
-            Log.e(TAG, e.getMessage());
+            Log.e(TAG, "getFPS " + e.getMessage());
             return NO_FPS_CALCULATED;
         }
 
