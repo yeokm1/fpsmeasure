@@ -49,7 +49,7 @@ public class FgService extends Service {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
 
-        params.gravity = Gravity.TOP | Gravity.RIGHT;
+        params.gravity = Gravity.TOP | Gravity.END;
         params.x = 0;
         params.y = 100;
 
