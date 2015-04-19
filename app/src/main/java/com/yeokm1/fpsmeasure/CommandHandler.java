@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class CommandHandler {
 
 
-    private static final int UPDATE_RATE = 1000;
+    private static final int UPDATE_RATE = 500;
     public static final float TIME_INTERVAL_NANO_SECONDS = 1000000000;
     public static final int BUFF_LEN = 1000;
 
