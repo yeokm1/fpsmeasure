@@ -77,6 +77,7 @@ public class FgService extends Service {
         super.onDestroy();
         if (fpsView != null) {
             windowManager.removeView(fpsView);
+            windowManager.removeView(freqView);
         }
     }
 
