@@ -7,6 +7,7 @@ import android.util.Log;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -24,7 +25,11 @@ public class CommandHandler {
 
     public static final int MAX_FPS = 60;
     public static final int NO_FPS_CALCULATED = -1;
-    protected static final String FPS_COMMAND = "dumpsys SurfaceFlinger --latency SurfaceView\n";
+    private static final String FPS_COMMAND = "dumpsys SurfaceFlinger --latency SurfaceView\n";
+
+    private static final String FILE_CPU_FREQ = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_setspeed";
+    private static final String FILE_GPU_NEXUS5_FREQ = "/sys/class/kgsl/kgsl-3d0/gpuclk";
+
 
     private static final String TAG = "CommandHandler";
 
@@ -76,8 +81,13 @@ public class CommandHandler {
                             try {
                                 processOfGettingFPS = true;
                                 int fps = getFPS();
+                                long cpu = getCPUFreq();
+                                long gpu = getGPUFreq();
 
                                 fgServiceIntent.putExtra(FgService.INTENT_FPS_DATA, fps);
+                                fgServiceIntent.putExtra(FgService.INTENT_CPU_DATA, cpu);
+                                fgServiceIntent.putExtra(FgService.INTENT_GPU_DATA, gpu);
+
                                 context.startService(fgServiceIntent);
 
                                 Log.i(TAG, "FPS: " + fps);
@@ -123,6 +133,18 @@ public class CommandHandler {
 
         context.stopService(fgServiceIntent);
 
+    }
+
+    private long getCPUFreq(){
+        String cpuStr =  getStringFromFile(FILE_CPU_FREQ);
+        long value = Long.valueOf(cpuStr);
+        return value;
+    }
+
+    private long getGPUFreq(){
+        String gpuStr = getStringFromFile(FILE_GPU_NEXUS5_FREQ);
+        long value = Long.valueOf(gpuStr);
+        return value;
     }
 
 
@@ -221,4 +243,16 @@ public class CommandHandler {
 
     }
 
+
+    public String getStringFromFile(String filePath){
+        try {
+            RandomAccessFile reader = new RandomAccessFile(filePath, "r");
+            String output = reader.readLine();
+            reader.close();
+            return output;
+        } catch (IOException e) {
+            return "";
+        }
+
+    }
 }

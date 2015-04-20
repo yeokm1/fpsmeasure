@@ -25,8 +25,12 @@ public class FgService extends Service {
 
     private WindowManager windowManager;
     private TextView fpsView;
+    private TextView freqView;
 
     public static final String INTENT_FPS_DATA = "fps";
+    public static final String INTENT_CPU_DATA = "cpu";
+    public static final String INTENT_GPU_DATA = "gpu";
+
 
     @Override
     public void onCreate(){
@@ -41,6 +45,12 @@ public class FgService extends Service {
 
         setFPSViewText("NA");
 
+        freqView = new TextView(this);
+        freqView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        freqView.setTextColor(Color.GREEN);
+
+        setFreqView(0, 0);
+
 
         WindowManager.LayoutParams params = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
@@ -49,11 +59,15 @@ public class FgService extends Service {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
 
-        params.gravity = Gravity.END;
+        params.gravity = Gravity.START | Gravity.TOP;
         params.x = 0;
-        params.y = 100;
+
 
         windowManager.addView(fpsView, params);
+
+
+        params.y = 100;
+        windowManager.addView(freqView, params);
 
         runAsForeground();
     }
@@ -75,12 +89,17 @@ public class FgService extends Service {
             setFPSViewText("NA");
         } else {
             int fps = bundle.getInt(INTENT_FPS_DATA);
+            long cpu = bundle.getLong(INTENT_CPU_DATA);
+            long gpu = bundle.getLong(INTENT_GPU_DATA);
 
-            Log.i(TAG, "FPS: " + fps);
+            Log.i(TAG, "FPS: " + fps + ", CPU: " + cpu + ", GPU: " + gpu);
 
             if(fps != CommandHandler.NO_FPS_CALCULATED) {
                 setFPSViewText(Integer.toString(fps));
+                setFreqView(cpu, gpu);
             }
+
+
         }
 
         return START_STICKY;
@@ -89,6 +108,16 @@ public class FgService extends Service {
     private void setFPSViewText(String text){
         if(fpsView != null){
             fpsView.setText(text);
+        }
+    }
+
+    private void setFreqView(long cpu, long gpu){
+        if(freqView != null){
+
+            cpu /= 1000;
+            gpu /= 1000000;
+
+            freqView.setText("CPU: " + cpu  + "MHz\nGPU: " + gpu + "MHz");
         }
     }
 
